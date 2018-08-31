@@ -9,41 +9,41 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type SwarmTaskClientTestSuite struct {
+type SwarmTaskTestSuite struct {
 	suite.Suite
-	DockerClient       *client.Client
-	SwarmServiceClient *SwarmServiceClient
-	SwarmTaskClient    *SwarmTaskClient
+	DockerClient *client.Client
+	SwarmService *SwarmService
+	SwarmTask    *SwarmTask
 }
 
-func TestSwarmTaskClientTestSuite(t *testing.T) {
-	suite.Run(t, new(SwarmTaskClientTestSuite))
+func TestSwarmTaskTestSuite(t *testing.T) {
+	suite.Run(t, new(SwarmTaskTestSuite))
 }
 
-func (s *SwarmTaskClientTestSuite) SetupSuite() {
+func (s *SwarmTaskTestSuite) SetupSuite() {
 	createTestService("nginx-registrator", []string{"registrator.enabled=true"}, []string{"mode=host,target=80"}, "", "dnsrr", "nginx:alpine")
 	createTestService("nginx", []string{}, []string{}, "", "", "nginx:alpine")
 	scaleTestService("nginx-registrator", 5)
 }
 
-func (s *SwarmTaskClientTestSuite) SetupTest() {
+func (s *SwarmTaskTestSuite) SetupTest() {
 	client, err := NewDockerClient("", map[string]string{})
 
 	s.Require().NoError(err)
 	s.Require().NotNil(client)
 
-	s.SwarmServiceClient = NewSwarmServiceClient(client, "registrator.enabled=true")
-	s.SwarmTaskClient = NewSwarmTaskClient(client)
+	s.SwarmService = NewSwarmService(client, "registrator.enabled=true")
+	s.SwarmTask = NewSwarmTask(client)
 }
 
-func (s *SwarmTaskClientTestSuite) TearDownSuite() {
+func (s *SwarmTaskTestSuite) TearDownSuite() {
 	removeTestService("nginx-registrator")
 	removeTestService("nginx")
 }
 
-func (s *SwarmTaskClientTestSuite) Test_GetTasks() {
+func (s *SwarmTaskTestSuite) Test_GetTasks() {
 	ctx := context.Background()
-	services, err := s.SwarmServiceClient.GetServices(ctx)
+	services, err := s.SwarmService.GetServices(ctx)
 
 	s.Require().NoError(err)
 	s.Len(services, 1)
@@ -52,7 +52,7 @@ func (s *SwarmTaskClientTestSuite) Test_GetTasks() {
 	filter.Add("service", services[0].ID)
 	filter.Add("desired-state", "running")
 
-	task, err := s.SwarmTaskClient.GetTask(ctx, filter)
+	task, err := s.SwarmTask.GetTask(ctx, filter)
 
 	s.Require().NoError(err)
 	s.Len(task, 5)

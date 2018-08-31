@@ -9,8 +9,8 @@ import (
 	"github.com/docker/docker/client"
 )
 
-// SwarmTaskClient implements SwarmTasks
-type SwarmTaskClient struct {
+// SwarmTask implements SwarmTasks
+type SwarmTask struct {
 	DockerClient *client.Client
 }
 
@@ -19,15 +19,16 @@ type SwarmTasks interface {
 	GetTask(ctx context.Context, filter filters.Args) ([]swarm.Task, error)
 }
 
-// NewSwarmTaskClient return an instance of task
-func NewSwarmTaskClient(client *client.Client) *SwarmTaskClient {
-	return &SwarmTaskClient{
+// NewSwarmTask returns an instance of SwarmTask
+func NewSwarmTask(client *client.Client) *SwarmTask {
+	return &SwarmTask{
 		client,
 	}
 }
 
-// GetTask running in the cluster
-func (t *SwarmTaskClient) GetTask(ctx context.Context, filter filters.Args) ([]swarm.Task, error) {
+// GetTask all tasks related to a service running in the cluster
+// You will find the available filters on https://docs.docker.com/engine/api/v1.37/#operation/TaskList
+func (t *SwarmTask) GetTask(ctx context.Context, filter filters.Args) ([]swarm.Task, error) {
 	tasks, err := t.DockerClient.TaskList(ctx, types.TaskListOptions{Filters: filter})
 
 	if err != nil {

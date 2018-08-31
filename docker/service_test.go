@@ -7,36 +7,36 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type SwarmServiceClientTestSuite struct {
+type SwarmServiceTestSuite struct {
 	suite.Suite
-	SwarmServiceClient *SwarmServiceClient
+	SwarmService *SwarmService
 }
 
-func TestSwarmServiceClientTestSuite(t *testing.T) {
-	suite.Run(t, new(SwarmServiceClientTestSuite))
+func TestSwarmServiceTestSuite(t *testing.T) {
+	suite.Run(t, new(SwarmServiceTestSuite))
 }
 
-func (s *SwarmServiceClientTestSuite) SetupSuite() {
+func (s *SwarmServiceTestSuite) SetupSuite() {
 	createTestService("nginx-registrator", []string{"registrator.enabled=true"}, []string{"mode=host,target=80"}, "", "dnsrr", "nginx:alpine")
 	createTestService("nginx", []string{}, []string{}, "", "", "nginx:alpine")
 }
 
-func (s *SwarmServiceClientTestSuite) SetupTest() {
+func (s *SwarmServiceTestSuite) SetupTest() {
 	client, err := NewDockerClient("", map[string]string{})
 
 	s.Require().NoError(err)
 	s.Require().NotNil(client)
 
-	s.SwarmServiceClient = NewSwarmServiceClient(client, "registrator.enabled=true")
+	s.SwarmService = NewSwarmService(client, "registrator.enabled=true")
 }
 
-func (s *SwarmServiceClientTestSuite) TearDownSuite() {
+func (s *SwarmServiceTestSuite) TearDownSuite() {
 	removeTestService("nginx-registrator")
 	removeTestService("nginx")
 }
 
-func (s *SwarmServiceClientTestSuite) Test_GetServices() {
-	services, err := s.SwarmServiceClient.GetServices(context.Background())
+func (s *SwarmServiceTestSuite) Test_GetServices() {
+	services, err := s.SwarmService.GetServices(context.Background())
 
 	s.Require().NoError(err)
 
