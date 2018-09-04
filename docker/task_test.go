@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/albertogviana/docker-swarm-registrator/tests"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
 	"github.com/stretchr/testify/suite"
@@ -21,9 +22,9 @@ func TestSwarmTaskTestSuite(t *testing.T) {
 }
 
 func (s *SwarmTaskTestSuite) SetupSuite() {
-	createTestService("nginx-registrator", []string{"registrator.enabled=true"}, []string{"mode=host,target=80"}, "", "dnsrr", "nginx:alpine")
-	createTestService("nginx", []string{}, []string{}, "", "", "nginx:alpine")
-	scaleTestService("nginx-registrator", 5)
+	tests.CreateTestService("nginx-registrator", []string{"registrator.enabled=true"}, []string{"mode=host,target=80"}, "", "dnsrr", "nginx:alpine")
+	tests.CreateTestService("nginx", []string{}, []string{}, "", "", "nginx:alpine")
+	tests.ScaleTestService("nginx-registrator", 5)
 }
 
 func (s *SwarmTaskTestSuite) SetupTest() {
@@ -37,8 +38,8 @@ func (s *SwarmTaskTestSuite) SetupTest() {
 }
 
 func (s *SwarmTaskTestSuite) TearDownSuite() {
-	removeTestService("nginx-registrator")
-	removeTestService("nginx")
+	tests.RemoveTestService("nginx-registrator")
+	tests.RemoveTestService("nginx")
 }
 
 func (s *SwarmTaskTestSuite) Test_GetTasks() {
