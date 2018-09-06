@@ -37,3 +37,15 @@ func (s *SwarmNode) GetNodes(ctx context.Context, filter filters.Args) ([]swarm.
 
 	return nodes, nil
 }
+
+// GetNodeByID get a node by id
+func (s *SwarmNode) GetNodeByID(ctx context.Context, id string) (swarm.Node, error) {
+	filter := filters.NewArgs()
+	filter.Add("id", id)
+	node, err := s.GetNodes(ctx, filter)
+	if err != nil {
+		return swarm.Node{}, err
+	}
+
+	return node[0], nil
+}
