@@ -45,7 +45,6 @@ func NewService(swarmService *docker.SwarmService, swarmTask *docker.SwarmTask, 
 
 // GetServices returns all services running in the cluster that has the label `registrator.enabled=true`
 func (s *Service) GetServices(ctx context.Context) (*[]SwarmService, error) {
-
 	svc, err := s.SwarmService.GetServices(ctx)
 	if err != nil {
 		return nil, err
@@ -75,7 +74,6 @@ func (s *Service) GetServices(ctx context.Context) (*[]SwarmService, error) {
 }
 
 func (s *Service) getTasksByService(ctx context.Context, ss swarm.Service, filters filters.Args) ([]SwarmTask, error) {
-
 	tasks, err := s.SwarmTask.GetTask(ctx, filters)
 	if err != nil {
 		return nil, err
