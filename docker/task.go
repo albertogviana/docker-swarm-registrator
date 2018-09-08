@@ -28,12 +28,14 @@ func NewSwarmTask(client *client.Client) *SwarmTask {
 
 // GetTask all tasks related to a service running in the cluster
 // You will find the available filters on https://docs.docker.com/engine/api/v1.37/#operation/TaskList
-func (t *SwarmTask) GetTask(ctx context.Context, filter filters.Args) ([]swarm.Task, error) {
+func (t *SwarmTask) GetTask(ctx context.Context, filter filters.Args) (*[]swarm.Task, error) {
+	tasks := []swarm.Task{}
+
 	tasks, err := t.DockerClient.TaskList(ctx, types.TaskListOptions{Filters: filter})
 
 	if err != nil {
-		return []swarm.Task{}, err
+		return &tasks, err
 	}
 
-	return tasks, nil
+	return &tasks, nil
 }

@@ -47,14 +47,16 @@ func (s *SwarmTaskTestSuite) Test_GetTasks() {
 	services, err := s.SwarmService.GetServices(ctx)
 
 	s.Require().NoError(err)
-	s.Len(services, 1)
+	s.Len(*services, 1)
+
+	svc := *services
 
 	filter := filters.NewArgs()
-	filter.Add("service", services[0].ID)
+	filter.Add("service", svc[0].Spec.Name)
 	filter.Add("desired-state", "running")
 
 	task, err := s.SwarmTask.GetTask(ctx, filter)
 
 	s.Require().NoError(err)
-	s.Len(task, 5)
+	s.Len(*task, 5)
 }

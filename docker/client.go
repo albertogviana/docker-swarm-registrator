@@ -4,7 +4,7 @@ import (
 	"github.com/docker/docker/client"
 )
 
-var dockerAPIVersion = "v1.37"
+var dockerAPIVersion = "v1.38"
 
 // NewDockerClient creates a docker client connection
 func NewDockerClient(host string, defaultHeaders map[string]string) (*client.Client, error) {

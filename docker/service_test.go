@@ -40,6 +40,5 @@ func (s *SwarmServiceTestSuite) Test_GetServices() {
 	services, err := s.SwarmService.GetServices(context.Background())
 
 	s.Require().NoError(err)
-
-	s.Len(services, 1)
+	s.Len(*services, 1)
 }

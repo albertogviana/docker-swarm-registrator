@@ -17,7 +17,7 @@ type SwarmService struct {
 
 // SwarmServices defines interfaces with the required methods
 type SwarmServices interface {
-	GetServices(ctx context.Context) ([]swarm.Service, error)
+	GetServices(ctx context.Context) (*[]swarm.Service, error)
 }
 
 // NewSwarmService returns an instance of SwarmService
@@ -30,7 +30,7 @@ func NewSwarmService(client *client.Client, filterLabel string) *SwarmService {
 
 // GetServices all services running in the cluster
 // You will find the available filters on https://docs.docker.com/engine/api/v1.32/#operation/ServiceList
-func (s *SwarmService) GetServices(ctx context.Context) ([]swarm.Service, error) {
+func (s *SwarmService) GetServices(ctx context.Context) (*[]swarm.Service, error) {
 	filter := filters.NewArgs()
 	filter.Add("label", s.FilterLabel)
 
@@ -45,5 +45,5 @@ func (s *SwarmService) GetServices(ctx context.Context) ([]swarm.Service, error)
 		swarmServices = append(swarmServices, service)
 	}
 
-	return swarmServices, nil
+	return &swarmServices, nil
 }
