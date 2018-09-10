@@ -20,20 +20,6 @@ type Services interface {
 	GetServices(ctx context.Context) (*[]SwarmService, error)
 }
 
-// SwarmService defines the service and their tasks
-type SwarmService struct {
-	ID   string
-	Name string
-	Task []SwarmTask
-}
-
-// SwarmTask defines the tasks running in a cluster
-type SwarmTask struct {
-	ID      string
-	Address string
-	Port    int
-}
-
 // NewService returns a new instance of the Service structure
 func NewService(swarmService *docker.SwarmService, swarmTask *docker.SwarmTask, swarmNode *docker.SwarmNode) *Service {
 	return &Service{
@@ -83,6 +69,7 @@ func (s *Service) getTasksByService(ctx context.Context, ss swarm.Service, filte
 	for _, task := range *tasks {
 		t := SwarmTask{}
 		t.ID = task.ID
+		t.Name = ss.Spec.Name
 
 		node, err := s.SwarmNode.GetNodeByID(ctx, task.NodeID)
 		if err != nil {

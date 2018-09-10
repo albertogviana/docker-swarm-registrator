@@ -5,6 +5,7 @@ import (
 	"os/exec"
 )
 
+// CreateTestService deploys a swarm service
 func CreateTestService(name string, labels []string, publish []string, mode string, endpointMode string, image string) {
 	args := []string{"service", "create", "--name", name}
 	for _, v := range labels {
@@ -23,10 +24,12 @@ func CreateTestService(name string, labels []string, publish []string, mode stri
 	exec.Command("docker", args...).Output()
 }
 
+// ScaleTestService scales a swarm service
 func ScaleTestService(name string, replicas int) {
 	exec.Command("docker", "service", "scale", fmt.Sprintf("%s=%d", name, replicas)).Output()
 }
 
+// RemoveTestService remove a swarm service
 func RemoveTestService(name string) {
 	exec.Command("docker", "service", "rm", name).Output()
 }
