@@ -6,13 +6,16 @@ import (
 )
 
 // CreateTestService deploys a swarm service
-func CreateTestService(name string, labels []string, publish []string, mode string, endpointMode string, image string) {
+func CreateTestService(name string, labels []string, publish []string, mode string, endpointMode string, image string, environment []string) {
 	args := []string{"service", "create", "--name", name}
 	for _, v := range labels {
 		args = append(args, "-l", v)
 	}
 	for _, v := range publish {
 		args = append(args, "--publish", v)
+	}
+	for _, v := range environment {
+		args = append(args, "-e", v)
 	}
 	if len(mode) > 0 {
 		args = append(args, "--mode", "global")

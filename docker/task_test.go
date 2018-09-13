@@ -22,8 +22,8 @@ func TestSwarmTaskTestSuite(t *testing.T) {
 }
 
 func (s *SwarmTaskTestSuite) SetupSuite() {
-	tests.CreateTestService("nginx-registrator", []string{"registrator.enabled=true"}, []string{"mode=host,target=80"}, "", "dnsrr", "nginx:alpine")
-	tests.CreateTestService("nginx", []string{}, []string{}, "", "", "nginx:alpine")
+	tests.CreateTestService("nginx-registrator", []string{"registrator.enabled=true"}, []string{"mode=host,target=80"}, "", "dnsrr", "nginx:alpine", []string{})
+	tests.CreateTestService("nginx", []string{}, []string{}, "", "", "nginx:alpine", []string{})
 	tests.ScaleTestService("nginx-registrator", 5)
 }
 

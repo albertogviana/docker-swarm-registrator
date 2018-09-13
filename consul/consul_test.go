@@ -27,8 +27,9 @@ func TestConsulTestSuite(t *testing.T) {
 }
 
 func (c *ConsulTestSuite) SetupSuite() {
-	tests.CreateTestService("nginx-registrator", []string{"registrator.enabled=true"}, []string{"mode=host,target=80"}, "", "dnsrr", "nginx:alpine")
-	tests.CreateTestService("service-1", []string{"registrator.enabled=true", "registrator.checks.1.name=service-health", "registrator.checks.1.id=service-health", "registrator.checks.1.interval=10s", "registrator.checks.1.timeout=10s", "registrator.checks.1.path=/", "registrator.checks.1.http=true", "registrator.checks.1.removefailedserviceafter=30s"}, []string{"mode=host,target=80"}, "", "dnsrr", "nginx:alpine")
+	tests.CreateTestService("consul", []string{}, []string{"8300:8300", "8500:8500"}, "", "", "consul", []string{"CONSUL_BIND_INTERFACE=eth0"})
+	tests.CreateTestService("nginx-registrator", []string{"registrator.enabled=true"}, []string{"mode=host,target=80"}, "", "dnsrr", "nginx:alpine", []string{})
+	tests.CreateTestService("service-1", []string{"registrator.enabled=true", "registrator.checks.1.name=service-health", "registrator.checks.1.id=service-health", "registrator.checks.1.interval=10s", "registrator.checks.1.timeout=10s", "registrator.checks.1.path=/", "registrator.checks.1.http=true", "registrator.checks.1.removefailedserviceafter=30s"}, []string{"mode=host,target=80"}, "", "dnsrr", "nginx:alpine", []string{})
 	tests.ScaleTestService("nginx-registrator", 3)
 	tests.ScaleTestService("service-1", 5)
 }
@@ -53,6 +54,7 @@ func (c *ConsulTestSuite) SetupTest() {
 func (c *ConsulTestSuite) TearDownSuite() {
 	tests.RemoveTestService("nginx-registrator")
 	tests.RemoveTestService("service-1")
+	tests.RemoveTestService("consul")
 }
 
 func (c *ConsulTestSuite) Test_Consul() {
