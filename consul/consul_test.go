@@ -28,8 +28,9 @@ func TestConsulTestSuite(t *testing.T) {
 
 func (c *ConsulTestSuite) SetupSuite() {
 	tests.CreateTestService("nginx-registrator", []string{"registrator.enabled=true"}, []string{"mode=host,target=80"}, "", "dnsrr", "nginx:alpine")
-	tests.CreateTestService("service-1", []string{"registrator.enabled=true"}, []string{"mode=host,target=80"}, "", "dnsrr", "nginx:alpine")
+	tests.CreateTestService("service-1", []string{"registrator.enabled=true", "registrator.checks.1.name=service-health", "registrator.checks.1.id=service-health", "registrator.checks.1.interval=10s", "registrator.checks.1.timeout=10s", "registrator.checks.1.path=/", "registrator.checks.1.http=true", "registrator.checks.1.removefailedserviceafter=30s"}, []string{"mode=host,target=80"}, "", "dnsrr", "nginx:alpine")
 	tests.ScaleTestService("nginx-registrator", 3)
+	tests.ScaleTestService("service-1", 5)
 }
 
 func (c *ConsulTestSuite) SetupTest() {
@@ -69,10 +70,26 @@ func (c *ConsulTestSuite) Test_Consul() {
 		}
 	}
 
+	service1Catalog, _, err := c.ConsulClient.Catalog().Service("service-1", "", &consulapi.QueryOptions{})
+	c.Require().NoError(err)
+	c.Len(service1Catalog, 5)
+
+	nginxCatalog, _, err := c.ConsulClient.Catalog().Service("nginx-registrator", "", &consulapi.QueryOptions{})
+	c.Require().NoError(err)
+	c.Len(nginxCatalog, 3)
+
 	for _, svc := range *services {
 		for _, task := range svc.Task {
 			err = consul.Deregister(task.ID)
 			c.Require().NoError(err)
 		}
 	}
+
+	service1Catalog, _, err = c.ConsulClient.Catalog().Service("service-1", "", &consulapi.QueryOptions{})
+	c.Require().NoError(err)
+	c.Len(service1Catalog, 0)
+
+	nginxCatalog, _, err = c.ConsulClient.Catalog().Service("nginx-registrator", "", &consulapi.QueryOptions{})
+	c.Require().NoError(err)
+	c.Len(nginxCatalog, 0)
 }

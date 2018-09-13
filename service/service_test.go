@@ -21,7 +21,7 @@ func TestServiceTestSuite(t *testing.T) {
 }
 
 func (s *ServiceTestSuite) SetupSuite() {
-	tests.CreateTestService("service-1", []string{"registrator.enabled=true"}, []string{"mode=host,target=80"}, "", "dnsrr", "nginx:alpine")
+	tests.CreateTestService("service-1", []string{"registrator.enabled=true", "registrator.checks.1.name=service-1-health", "registrator.checks.1.id=service-1-health", "registrator.checks.1.interval=10s", "registrator.checks.1.timeout=10s", "registrator.checks.1.path=/", "registrator.checks.1.http=true", "registrator.checks.1.removefailedserviceafter=30s"}, []string{"mode=host,target=80"}, "", "dnsrr", "nginx:alpine")
 	tests.CreateTestService("service-2", []string{"registrator.enabled=true"}, []string{"mode=host,target=80"}, "", "dnsrr", "nginx:alpine")
 	tests.ScaleTestService("service-1", 3)
 }

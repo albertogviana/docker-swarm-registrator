@@ -40,3 +40,7 @@
 [[constraint]]
   name = "github.com/hashicorp/consul"
   version = "1.2.2"
+
+[[constraint]]
+  name = "github.com/mitchellh/mapstructure"
+  version = "1.0.0"

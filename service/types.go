@@ -13,4 +13,17 @@ type SwarmTask struct {
 	Name    string
 	Address string
 	Port    int
+	Checks  []Check
+}
+
+// Check defines the health check for the application
+type Check struct {
+	ID                       string
+	Name                     string
+	Interval                 string
+	Timeout                  string
+	HTTP                     string
+	Path                     string
+	Header                   map[string][]string
+	RemoveFailedServiceAfter string
 }

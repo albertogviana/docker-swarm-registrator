@@ -2,10 +2,13 @@ package service
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"github.com/albertogviana/docker-swarm-registrator/docker"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/swarm"
+	"github.com/mitchellh/mapstructure"
 )
 
 // Service defines the based structure
@@ -65,11 +68,20 @@ func (s *Service) getTasksByService(ctx context.Context, ss swarm.Service, filte
 		return nil, err
 	}
 
+	checks, err := s.getServiceLabels(ss)
+	if err != nil {
+		return nil, err
+	}
+
 	swarmTasks := []SwarmTask{}
 	for _, task := range *tasks {
 		t := SwarmTask{}
 		t.ID = task.ID
 		t.Name = ss.Spec.Name
+
+		if len(checks) > 0 {
+			t.Checks = checks
+		}
 
 		node, err := s.SwarmNode.GetNodeByID(ctx, task.NodeID)
 		if err != nil {
@@ -86,4 +98,32 @@ func (s *Service) getTasksByService(ctx context.Context, ss swarm.Service, filte
 	}
 
 	return swarmTasks, nil
+}
+
+func (s *Service) getServiceLabels(ss swarm.Service) ([]Check, error) {
+	checks := []Check{}
+
+	params := map[string]map[string]string{}
+	for k, v := range ss.Spec.Labels {
+		if strings.HasPrefix(k, "registrator.checks.") && k != "registrator.enabled" {
+			index := strings.TrimPrefix(k, "registrator.checks.")[:1]
+			if params[index] == nil {
+				params[index] = map[string]string{}
+			}
+
+			params[index][strings.TrimPrefix(k, fmt.Sprintf("registrator.checks.%s.", index))] = v
+		}
+	}
+
+	if len(params) > 0 {
+		for k := range params {
+			if len(params[k]) > 0 {
+				var check Check
+				mapstructure.Decode(params[k], &check)
+				checks = append(checks, check)
+			}
+		}
+	}
+
+	return checks, nil
 }
