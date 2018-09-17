@@ -17,6 +17,7 @@ type Consul struct {
 type Services interface {
 	Register(service service.SwarmTask) error
 	Deregister(serviceID string) error
+	GetService(service, tag string, q *consulapi.QueryOptions) ([]*consulapi.CatalogService, error)
 }
 
 // NewConsulClient returns a new instance of the Consul structure
@@ -68,4 +69,14 @@ func (c *Consul) Register(service service.SwarmTask) error {
 // Deregister a service with consul
 func (c *Consul) Deregister(serviceID string) error {
 	return c.ConsulClient.Agent().ServiceDeregister(serviceID)
+}
+
+// GetService search for a service in Consul
+func (c *Consul) GetService(service, tag string, q *consulapi.QueryOptions) ([]*consulapi.CatalogService, error) {
+	catalog, _, err := c.ConsulClient.Catalog().Service(service, tag, &consulapi.QueryOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	return catalog, nil
 }

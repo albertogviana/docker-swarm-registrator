@@ -72,11 +72,11 @@ func (c *ConsulTestSuite) Test_Consul() {
 		}
 	}
 
-	service1Catalog, _, err := c.ConsulClient.Catalog().Service("service-1", "", &consulapi.QueryOptions{})
+	service1Catalog, err := consul.GetService("service-1", "", &consulapi.QueryOptions{})
 	c.Require().NoError(err)
 	c.Len(service1Catalog, 5)
 
-	nginxCatalog, _, err := c.ConsulClient.Catalog().Service("nginx-registrator", "", &consulapi.QueryOptions{})
+	nginxCatalog, err := consul.GetService("nginx-registrator", "", &consulapi.QueryOptions{})
 	c.Require().NoError(err)
 	c.Len(nginxCatalog, 3)
 
@@ -87,11 +87,19 @@ func (c *ConsulTestSuite) Test_Consul() {
 		}
 	}
 
-	service1Catalog, _, err = c.ConsulClient.Catalog().Service("service-1", "", &consulapi.QueryOptions{})
+	service1Catalog, err = consul.GetService("service-1", "", &consulapi.QueryOptions{})
 	c.Require().NoError(err)
 	c.Len(service1Catalog, 0)
 
-	nginxCatalog, _, err = c.ConsulClient.Catalog().Service("nginx-registrator", "", &consulapi.QueryOptions{})
+	nginxCatalog, err = consul.GetService("nginx-registrator", "", &consulapi.QueryOptions{})
 	c.Require().NoError(err)
 	c.Len(nginxCatalog, 0)
+}
+
+func (c *ConsulTestSuite) Test_GetServiceNotFound() {
+	consul := NewConsulClient(c.ConsulClient)
+
+	service, err := consul.GetService("test", "", &consulapi.QueryOptions{})
+	c.Require().NoError(err)
+	c.Require().Len(service, 0)
 }
